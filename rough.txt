@@ -1,0 +1,24 @@
+    "test": "mocha --reporter mochawesome --timeout 50000 test/shoutL_login/shoutL_login.js"
+        "test": "mocha --reporter mochawesome --timeout 50000 test/shoutL_login/shoutL_login.js"
+
+        const element = $0;
+let xpath = '';
+while (element && element.nodeType === Node.ELEMENT_NODE) {
+  let localName = element.localName;
+  if (element.id) {
+    xpath = `//*[@id="${element.id}"]${xpath ? '/' + xpath : ''}`;
+    break;
+  } else {
+    let index = 1;
+    for (let sibling = element.previousSibling; sibling; sibling = sibling.previousSibling) {
+      if (sibling.localName === localName) {
+        index++;
+      }
+    }
+    localName += '[' + index + ']';
+    xpath = '/' + localName + xpath;
+  }
+  element = element.parentNode;
+}
+xpath = '/' + xpath;
+const data = { xpath };
