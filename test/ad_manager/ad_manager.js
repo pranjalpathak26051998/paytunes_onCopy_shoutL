@@ -86,6 +86,16 @@ const path = require('path');
                 await driver.sleep(2000);
                 await takeScreenshot(driver, 'ad-manager.png');
             });
+            let audio_text_xpath = `//div[@class='react-multi-carousel-list carousel-container ']/ul/li/div[@class='m-7']/a/label`;
+            // let audio_text_xpath = `//*[@id="root"]/div[2]/div[2]/main/div/div/div[2]/section[1]/div/div[1]/ul/li[7]/div/a/label`;
+            //get Text from create audio following the xpath
+            it('should get the text from create audio', async () => {
+                await driver.wait(until.elementLocated(By.xpath(audio_text_xpath)),5000);
+                let text = await driver.findElement(By.xpath(audio_text_xpath)).getText();
+                console.log(`Text from create audio: ${text}`);
+            });
+
+
             
 
         } catch (error) {
