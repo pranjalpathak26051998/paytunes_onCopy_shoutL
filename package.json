@@ -4,7 +4,7 @@
   "description": "Creating an automation for shoutl",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter mochawesome --timeout 50000 test/ad_manager/ad_manager.js"
+    "test_adManager": "mocha --reporter mochawesome --timeout 50000 test/ad_manager/ad_manager.js"
   },
   "author": "Pranjal Pathak",
   "license": "ISC",
@@ -13,6 +13,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.19.2",
     "mocha": "^11.0.1",
+    "openai": "^4.77.0",
     "selenium-webdriver": "^4.27.0"
   },
   "devDependencies": {
