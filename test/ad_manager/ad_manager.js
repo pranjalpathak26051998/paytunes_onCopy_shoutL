@@ -2,12 +2,18 @@ const { Builder, By, Browser, until, key } = require('selenium-webdriver');
 const mocha = require('mocha');
 const fs = require('fs');
 const path = require('path');
+const Openai = require('openai');
+require('dotenv').config(); //
 
 (async function shoutl_login() {
     let driver;
-    let website_url = 'https://staging-app.shoutl.com/';
-    let stg_username = 'pranjal.p+staging_Pranjal@paytunes.in';
-    let stg_password = 'User@123';
+    let website_url = process.env.website_url;
+    let stg_username = process.env.stg_username;
+    let stg_password = process.env.stg_password;
+    let audio_text_xpath = process.env.audio_text_xpath;
+    let buy_audio_credits_xpath = process.env.buy_audio_credits_xpath;
+    let audio_credits_amount_xpath = process.env.audio_credits_amount_xpath;
+    let buy_audio_credits_amount = process.env.buy_audio_credits_amount;
     let text = '';
     let newtext = '';
 
@@ -30,10 +36,34 @@ const path = require('path');
         console.log(`Screenshot saved as ${filepath}`);
     }
 
+    //create a function to create audio
+    async function openCreateAudioPage() {
+        await driver.wait(until.elementLocated(By.xpath(audio_text_xpath)), 5000);
+        await driver.findElement(By.xpath(audio_text_xpath)).click();
+        await driver.sleep(5000);
+        await takeScreenshot(driver, 'createAudioPage.png');
+        
+        console.log('clicked on the Create audio now button successfully');
+    }
+
+    //create a function to buy the audio credits
+    //li[@class='react-multi-carousel-item react-multi-carousel-item--active ']//div[@class='m-7']//label
+    async function buyAudioCredits() {
+        await driver.wait(until.elementLocated(By.xpath(buy_audio_credits_xpath)),5000);
+        await driver.findElement(By.xpath(buy_audio_credits_xpath)).click();
+        await takeScreenshot(driver, 'buy_audio_credits_page.png');
+        //now enter the credits to be purchased
+        await driver.wait(until.elementLocated(By.xpath(audio_credits_amount_xpath)),5000);
+        await driver.findElement(By.xpath(audio_credits_amount_xpath)).click();
+        await driver.findElement(By.xpath(audio_credits_amount_xpath)).sendKeys(buy_audio_credits_amount);
+        await driver.sleep(2000);
+        await takeScreenshot(driver, 'buy_audio_credits_amount.png');
+        console.log(buy_audio_credits_amount + 'entered successfully');
+    }
 
     describe('Login and move to Ad manager to create ads', async function () {
         try {
-            this.timeout(25000); //Increase timeout to 10 seconds
+            this.timeout(25000); //Increase timeout to 25 seconds
             before(async function () {
                 driver = await new Builder().forBrowser(Browser.CHROME).build();
                 await maximizeWindow(driver);
@@ -89,29 +119,25 @@ const path = require('path');
                 await takeScreenshot(driver, 'ad-manager.png');
             });
             // let audio_text_xpath = `//div[@class='react-multi-carousel-list carousel-container ']/ul/li/div[@class='m-7']/a/label`;
-            let audio_text_xpath = `// div[@class='react-multi-carousel-list carousel-container ']/ul/li[@class='react-multi-carousel-item react-multi-carousel-item--active ']/div[@class='m-7']/a/label`;
+            // let audio_text_xpath = `// div[@class='react-multi-carousel-list carousel-container ']/ul/li[@class='react-multi-carousel-item react-multi-carousel-item--active ']/div[@class='m-7']/a/label`;
             //get Text from create audio following the xpath
             it('should get the text from create audio', async () => {
                 await driver.wait(until.elementLocated(By.xpath(audio_text_xpath)), 5000);
                 text = await driver.findElement(By.xpath(audio_text_xpath)).getText();
                 console.log(`Text from create audio: ${text}`);
             });
+              
 
             it('compare the text and take the action accordingly', async () => {
                 newtext = text;
                 if (newtext === 'Create audio now!') {
-                    await driver.wait(until.elementLocated(By.xpath(audio_text_xpath)), 5000);
-                    await driver.findElement(By.xpath(audio_text_xpath)).click();
-                    await driver.sleep(5000);
-                    await takeScreenshot(driver, 'createAudioPage.png');
-                    
-                    console.log('clicked on the Create audio now button successfully');
-                    // it('Click to create audio now!', async () => {
-                       
-                    // })                   
+                    await openCreateAudioPage();          
                     
                 }
-                else { console.log('Create audio not found') };
+                else if(newtext === 'Buy audio now!') {
+                    await buyAudioCredits();
+                    
+                    console.log('Create audio not found') };
             });
 
 
